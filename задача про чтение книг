@@ -1,0 +1,63 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <iomanip>
+
+using namespace std;
+
+
+void CommandHandler(istream& s_in, ostream& s_out) {
+    vector<int> name__page(100001);        // имя и номер страницы
+    vector<int> page__count_users(1001);  // страница и количество юзеров дочитавших до меньшей страницы
+    double full_count_users = 0;          // полное количество юзеров
+
+    int n;      // количество запросов
+    s_in >> n;
+
+    for(int i = 0 ; i<n ; ++i) {
+        string command;
+        int name;       // имя юзера
+        s_in >> command >> name;
+
+        if(command == "READ") {
+            int quantity_pages;
+            s_in >> quantity_pages;
+
+            if( quantity_pages > 0) {
+                if(name__page[name] == 0) {
+                    ++full_count_users;
+                } else {
+                    // name__page[name] - это предыдущее значение quantity_pages
+                    for(int i = name__page[name]+1 ; i<page__count_users.size() ; ++i) {
+                        --page__count_users[i];
+                    }
+                }
+
+                name__page[name] = quantity_pages;
+                for(int i = quantity_pages+1 ; i<page__count_users.size() ; ++i) {
+                    ++page__count_users[i];
+                }
+            }
+        }
+
+        if(command == "CHEER") {
+            if(name__page[name] == 0) {
+                s_out << 0 << endl;
+                continue;
+            }
+            if(full_count_users == 1) {
+                s_out << 1 << endl;
+                continue;
+            }
+
+            s_out << setprecision(6)
+                  << page__count_users[ name__page[name] ] / (full_count_users-1) << endl;
+        }
+    }
+}
+
+
+int main() {
+    CommandHandler(cin, cout);
+    return 0;
+}
