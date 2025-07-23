@@ -5,7 +5,6 @@
 
 using namespace std;
 
-
 void CommandHandler(istream& s_in, ostream& s_out) {
     vector<int> name__page(100001);        // имя и номер страницы
     vector<int> page__count_users(1001);  // страница и количество юзеров дочитавших до меньшей страницы
