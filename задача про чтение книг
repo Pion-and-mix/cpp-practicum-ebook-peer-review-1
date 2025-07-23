@@ -4,11 +4,11 @@
 #include <iomanip>
 
 using namespace std;
-
+ 
 void CommandHandler(istream& s_in, ostream& s_out) {
-    vector<int> name__page(100001);        // имя и номер страницы
-    vector<int> page__count_users(1001);  // страница и количество юзеров дочитавших до меньшей страницы
-    double full_count_users = 0;          // полное количество юзеров
+     vector<int> name__page(100001);        // имя и номер страницы
+     vector<int> page__count_users(1001);  // страница и количество юзеров дочитавших до меньшей страницы
+     double full_count_users = 0;          // полное количество юзеров
 
     int n;      // количество запросов
     s_in >> n;
@@ -23,18 +23,18 @@ void CommandHandler(istream& s_in, ostream& s_out) {
             s_in >> quantity_pages;
 
             if( quantity_pages > 0) {
-                if(name__page[name] == 0) {
+                 if(name__page[name] == 0) {
                     ++full_count_users;
                 } else {
                     // name__page[name] - это предыдущее значение quantity_pages
                     for(int i = name__page[name]+1 ; i<page__count_users.size() ; ++i) {
-                        --page__count_users[i];
+                         --page__count_users[i];
                     }
                 }
 
                 name__page[name] = quantity_pages;
                 for(int i = quantity_pages+1 ; i<page__count_users.size() ; ++i) {
-                    ++page__count_users[i];
+                     ++page__count_users[i];
                 }
             }
         }
