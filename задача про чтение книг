@@ -6,55 +6,82 @@
 using namespace std;
 
 
-void CommandHandler(istream& s_in, ostream& s_out) {
-    vector<int> name__page(100001);        // имя и номер страницы
-    vector<int> page__count_users(1001);  // страница и количество юзеров дочитавших до меньшей страницы
-    double full_count_users = 0;          // полное количество юзеров
+const int MAX_USER_COUNT = 100001;
+const int MAX_PAGE_COUNT = 1001;
 
+
+void Print(ostream& s_out, double less_fraction){
+    s_out << setprecision(6) << less_fraction << endl;
+}
+
+
+class Book {
+public:
+    Book() : name__page_(MAX_USER_COUNT, 0), page__count_users_(MAX_PAGE_COUNT, 0) {
+    }
+    
+    void Read(int name, int quantity_pages) {
+        if( quantity_pages > 0) {
+            if(name__page_[name] == 0) {
+                ++full_count_users_;
+            } else {
+                --page__count_users_[ name__page_[name] ];
+            }
+            
+            name__page_[name] = quantity_pages;
+            ++page__count_users_[ quantity_pages ];
+        }
+    }
+    
+    double Cheer(int name) const {
+        if(name__page_[name] == 0) {
+            return 0.0;
+        }
+        if(full_count_users_ == 1) {
+            return 1.0;
+        }
+        
+        int less_count_users = accumulate(page__count_users_.begin()
+                                          , page__count_users_.begin() + name__page_[name]
+                                          , 0
+                                          , [](int cur, int quantity_users){
+                                                return cur + quantity_users;
+                                            });
+        
+        return static_cast<double>(less_count_users) / (full_count_users_-1);
+    }
+    
+private:
+    vector<int> name__page_;         // имя и номер страницы
+    vector<int> page__count_users_;  // страница и количество юзеров дочитавших до меньшей страницы
+    int full_count_users_ = 0;                    // полное количество юзеров
+};
+
+
+void CommandHandler(istream& s_in, ostream& s_out) {
+    Book pages;
+    
     int n;      // количество запросов
     s_in >> n;
-
+    
     for(int i = 0 ; i<n ; ++i) {
         string command;
         int name;       // имя юзера
         s_in >> command >> name;
-
+        
         if(command == "READ") {
             int quantity_pages;
             s_in >> quantity_pages;
-
-            if( quantity_pages > 0) {
-                if(name__page[name] == 0) {
-                    ++full_count_users;
-                } else {
-                    // name__page[name] - это предыдущее значение quantity_pages
-                    for(int i = name__page[name]+1 ; i<page__count_users.size() ; ++i) {
-                        --page__count_users[i];
-                    }
-                }
-
-                name__page[name] = quantity_pages;
-                for(int i = quantity_pages+1 ; i<page__count_users.size() ; ++i) {
-                    ++page__count_users[i];
-                }
-            }
+            pages.Read(name, quantity_pages);
         }
-
+        
         if(command == "CHEER") {
-            if(name__page[name] == 0) {
-                s_out << 0 << endl;
-                continue;
-            }
-            if(full_count_users == 1) {
-                s_out << 1 << endl;
-                continue;
-            }
-
-            s_out << setprecision(6)
-                  << page__count_users[ name__page[name] ] / (full_count_users-1) << endl;
+            Print(s_out, pages.Cheer(name));
         }
+        
     }
 }
+
 
 
 int main() {
